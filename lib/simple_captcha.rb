@@ -48,7 +48,7 @@ module SimpleCaptcha
 
   # tmp directory
   mattr_accessor :tmp_path
-  @@tmp_path = nil
+  @@tmp_path = Dir::tmpdir
 
   def self.add_image_style(name, params = [])
     SimpleCaptcha::ImageHelpers.image_styles.update(name.to_s => params)
