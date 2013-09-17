@@ -66,7 +66,7 @@ module SimpleCaptcha #:nodoc
         params << "-wave #{amplitude}x#{frequency}"
         #params << "-gravity 'Center'"
         params << "-gravity \"Center\""
-        params << "-pointsize 22"
+        params << "-pointsize #{SimpleCaptcha.point_size}"
         params << "-implode 0.2"
 
         dst = Tempfile.new(RUBY_VERSION < '1.9' ? 'simple_captcha.jpg' : ['simple_captcha', '.jpg'], SimpleCaptcha.tmp_path)
