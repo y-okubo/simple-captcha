@@ -69,8 +69,12 @@ module SimpleCaptcha #:nodoc
 
         query = defaults.collect{ |key, value| "#{key}=#{value}" }.join('&')
         url = "#{ENV['RAILS_RELATIVE_URL_ROOT']}/simple_captcha?code=#{simple_captcha_key}&#{query}"
-
-        tag('img', :src => url, :alt => 'captcha')
+        if options[:object]
+          hidden_captcha_key = hidden_field(options[:object], :captcha_key, :value => options[:field_value])
+        else
+          hidden_captcha_key = hidden_field_tag(:captcha_key, options[:field_value])
+        end
+        tag('img', :src => url, :alt => 'captcha') + hidden_captcha_key
       end
 
       def simple_captcha_field(options={})
@@ -79,11 +83,9 @@ module SimpleCaptcha #:nodoc
         html[:placeholder] = options[:placeholder] || I18n.t('simple_captcha.placeholder')
 
         if options[:object]
-          text_field(options[:object], :captcha, html.merge(:value => '')) +
-          hidden_field(options[:object], :captcha_key, {:value => options[:field_value]})
+          text_field(options[:object], :captcha, html.merge(:value => ''))
         else
-          text_field_tag(:captcha, nil, html) +
-          hidden_field_tag(:captcha_key, options[:field_value])
+          text_field_tag(:captcha, nil, html)
         end
       end
 
