@@ -97,11 +97,17 @@ SimpleCaptcha detects if your use Formtastic and appends "SimpleCaptcha::CustomF
   <%= form.input :captcha, :as => :simple_captcha %>
 
 ===Redis Support
+
+Gemfile
+
+  gem 'redis'
+  gem 'redis-namespace'
+
 in 'application.rb', add belows code under Bundler.require(:default, Rails.env)
   
   SimpleCaptcha.store = 'redis'
 
-create an initilizer under then 'config/initializers' folder
+create an new initilizer
 
   # config/initializers/captcha.rb
   
