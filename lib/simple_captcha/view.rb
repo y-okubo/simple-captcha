@@ -45,14 +45,20 @@ module SimpleCaptcha #:nodoc
     def show_simple_captcha(options={})
       key = simple_captcha_key(options[:object])
       options[:field_value] = set_simple_captcha_data(key, options)
-      
+
       defaults = {
          :image => simple_captcha_image(key, options),
          :label => options[:label] || I18n.t('simple_captcha.label'),
          :field => simple_captcha_field(options)
          }
-         
+
       render :partial => 'simple_captcha/simple_captcha', :locals => { :simple_captcha_options => defaults }
+    end
+
+    def generate_simple_captcha_image(options={})
+      key = simple_captcha_key(options[:object])
+      options[:field_value] = set_simple_captcha_data(key, options)
+      simple_captcha_image(key, options)
     end
 
     private
@@ -60,56 +66,58 @@ module SimpleCaptcha #:nodoc
       def simple_captcha_image(simple_captcha_key, options = {})
         defaults = {}
         defaults[:time] = options[:time] || Time.now.to_i
-        
+
         query = defaults.collect{ |key, value| "#{key}=#{value}" }.join('&')
         url = "#{ENV['RAILS_RELATIVE_URL_ROOT']}/simple_captcha?code=#{simple_captcha_key}&#{query}"
-        
-        tag('img', :src => url, :alt => 'captcha')
+        if options[:object]
+          hidden_captcha_key = hidden_field(options[:object], :captcha_key, :value => options[:field_value])
+        else
+          hidden_captcha_key = hidden_field_tag(:captcha_key, options[:field_value])
+        end
+        tag('img', :src => url, :alt => 'captcha') + hidden_captcha_key
       end
-      
+
       def simple_captcha_field(options={})
         html = {:autocomplete => 'off', :required => 'required'}
         html.merge!(options[:input_html] || {})
         html[:placeholder] = options[:placeholder] || I18n.t('simple_captcha.placeholder')
-          
+
         if options[:object]
-          text_field(options[:object], :captcha, html.merge(:value => '')) +
-          hidden_field(options[:object], :captcha_key, {:value => options[:field_value]})
+          text_field(options[:object], :captcha, html.merge(:value => ''))
         else
-          text_field_tag(:captcha, nil, html) +
-          hidden_field_tag(:captcha_key, options[:field_value])
+          text_field_tag(:captcha, nil, html)
         end
       end
 
       def set_simple_captcha_data(key, options={})
         code_type = options[:code_type]
-        
+
         value = generate_simple_captcha_data(code_type)
         data = SimpleCaptcha::SimpleCaptchaData.get_data(key)
         data.value = value
         data.save
         key
       end
-   
+
       def generate_simple_captcha_data(code)
         value = ''
-        
+
         case code
-          when 'numeric' then 
+          when 'numeric' then
             SimpleCaptcha.length.times{value << (48 + rand(10)).chr}
           else
             SimpleCaptcha.length.times{value << (65 + rand(26)).chr}
         end
-        
+
         return value
       end
-      
+
       def simple_captcha_key(key_name = nil)
         if key_name.nil?
           session[:captcha] ||= SimpleCaptcha::Utils.generate_key(session[:id].to_s, 'captcha')
         else
           SimpleCaptcha::Utils.generate_key(session[:id].to_s, key_name)
         end
-      end 
+      end
   end
 end
