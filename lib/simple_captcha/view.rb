@@ -50,7 +50,7 @@ module SimpleCaptcha #:nodoc
          :image => simple_captcha_image(key, options),
          :label => options[:label] || I18n.t('simple_captcha.label'),
          :field => simple_captcha_field(options),
-         :object => options[:object]
+         :raw_object => options[:raw_object] || options[:object]
          }
 
       render :partial => 'simple_captcha/simple_captcha', :locals => { :simple_captcha_options => defaults }
