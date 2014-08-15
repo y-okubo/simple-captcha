@@ -30,7 +30,8 @@ module SimpleCaptcha
         end
 
         def simple_captcha_field(options={})
-          html = {:autocomplete => 'off', :required => 'required', :value => ''}
+          # html = {:autocomplete => 'off', :required => 'required', :value => ''}
+          html = {:autocomplete => 'off', :value => ''}
           html.merge!(options[:input_html] || {})
           html[:placeholder] = options[:placeholder] || I18n.t('simple_captcha.placeholder')
 
